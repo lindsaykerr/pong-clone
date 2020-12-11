@@ -2,6 +2,9 @@ package pong;
 
 /**
  * Creates a data structure which defines the size of the game board.
+
+ * @author Lindsay Kerr
+ * @version 0.1
  */
 public class Board {
     private final int height;

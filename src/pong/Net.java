@@ -3,6 +3,9 @@ package pong;
 /**
  * Used to create Net object, if a ball enters the net points can be awarded or deducted
  * from a Score object
+ *
+ * @author Lindsay Kerr
+ * @version 0.1
  */
 
 public class Net implements Impact, IScore {

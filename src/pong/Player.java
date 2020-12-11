@@ -1,6 +1,9 @@
 package pong;
 /**
  * Player class is primarily used to hold reference to a paddle object and score object
+ *
+ * @author Lindsay Kerr
+ * @version 0.1
  */
 public class Player implements IScore {
     public Paddle paddle;

@@ -2,6 +2,9 @@ package utilities;
 
 /**
  * General geometric and trigonometric calculation methods.
+ *
+ * @author Lindsay Kerr
+ * @version 0.1
  */
 public final class Calculate {
 

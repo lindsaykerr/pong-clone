@@ -20,7 +20,12 @@ import utilities.Calculate;
 
 //import java.awt.*;
 
-
+/**
+ * Contains the view and controller options for Pong Game interactions
+ *
+ * @author Lindsay Kerr
+ * @version 0.1
+ */
 public class Main extends Application {
 
     int screenWidth;

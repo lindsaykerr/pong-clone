@@ -9,6 +9,9 @@ import utilities.Calculate;
 /**
  * Ball entity with a number of attributes and behaviour relating to size,
  * position, speed and orientation within a 2D plain.
+ *
+ * @author Lindsay Kerr
+ * @version 0.1
  */
 public class Ball {
 

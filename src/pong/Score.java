@@ -2,6 +2,9 @@ package pong;
 
 /**
  * Holds game scores
+ *
+ * @author Lindsay Kerr
+ * @version 0.1
  */
 
 public class Score implements IScore {

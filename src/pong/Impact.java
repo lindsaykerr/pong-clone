@@ -6,6 +6,9 @@ package pong;
  * These objects must provide their position in the form of XY coordinates, so that
  * a collision can be tested with an implementation of the {@code}testImpact(){@code}
  * method to see if one has occurred.
+ *
+ * @author Lindsay Kerr
+ * @version 0.1
  */
 public interface Impact {
     /**

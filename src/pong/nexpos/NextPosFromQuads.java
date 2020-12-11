@@ -3,6 +3,12 @@ package pong.nexpos;
 import utilities.Calculate;
 
 
+/**
+ * Strategy which calculates the position of ball based on the quadrant the direction angle is pointing.
+ *
+ * @author Lindsay Kerr
+ * @version 0.1
+ */
 public class NextPosFromQuads extends pong.nexpos.StrategyNextPos {
 
 

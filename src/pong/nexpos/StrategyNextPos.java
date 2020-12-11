@@ -3,6 +3,9 @@ package pong.nexpos;
 /**
  * Abstract class for a Next Position algorithm, Strategy pattern is employed here which allows one
  * implementation to be easily exchanged for another.
+ *
+ * @author Lindsay Kerr
+ * @version 0.1
  */
 public abstract class StrategyNextPos {
 

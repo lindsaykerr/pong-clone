@@ -6,6 +6,8 @@ package pong;
  *  regarding the position and dimension of the game paddle.
  *  Provides a number of setters for altering such values.
  *
+ * @author Lindsay Kerr
+ * @version 0.1
  */
 public class Paddle implements Impact {
 

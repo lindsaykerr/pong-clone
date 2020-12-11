@@ -2,6 +2,9 @@ package pong;
 
 /**
  * A common interface for classes which utilise the Score class
+ *
+ * @author Lindsay Kerr
+ * @version 0.1
  */
 
 public interface IScore {
