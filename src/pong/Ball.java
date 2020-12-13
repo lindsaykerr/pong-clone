@@ -23,11 +23,18 @@ public class Ball {
 
 
     /* geometry */
-    private int diameter;
+    private int radius;
+
+    /* linear Algebra */
+    private double lineGradient;
+    private double distanceBetweenPoints;
+    private double yIntercept;
 
     /* position */
-    private int x;
-    private int y;
+    private int toX;
+    private int toY;
+    private double posX;
+    private double posY;
     private int fromX = 0;
     private int fromY = 0;
 
@@ -37,19 +44,21 @@ public class Ball {
     private byte xTravel = 0;
     private byte yTravel = 0;
 
+
+
     /* limitations */
     private final short[] boundary;
 
 
     public Ball() {
-        diameter = 0;
+        radius = 0;
         boundary = new short[]{100, 100};
     }
 
 
     public Ball(int diameter) {
 
-        this.diameter = diameter;
+        this.radius = diameter / 2;
         boundary = new short[2];
     }
 
@@ -61,16 +70,16 @@ public class Ball {
      * The X position of the ball
      * @return x coordinate
      */
-    public int getX() {
-        return x;
+    public int getToX() {
+        return toX;
     }
 
     /**
      * The y position of the ball
      * @return y coordinate
      */
-    public int getY() {
-        return y;
+    public int getToY() {
+        return toY;
     }
 
     /**
@@ -78,24 +87,31 @@ public class Ball {
      * @return {x, y}
      */
     public int[] getCoordinates() {
-        return new int[] {x, y};
+        return new int[] {toX, toY};
     }
 
     /**
      * Change the X coordinate of the ball
-     * @param x coordinate
+     * @param toX coordinate
      */
-    public void setX(int x) {
-        this.x = x;
+    public void setToX(int toX) {
+        this.toX = toX;
     }
 
     /**
      * Change the Y coordinate of the ball
-     * @param y coordinate
+     * @param toY coordinate
      */
-    public void setY(int y) {
-        this.y = y;
+    public void setToY(int toY) {
+        this.toY = toY;
     }
+
+
+   public double getXPos() { return this.posX; }
+
+
+   public double getYPos() { return this.posY; }
+
 
 
     /**
@@ -139,14 +155,18 @@ public class Ball {
      * @return the diameter of the ball
      */
     public int getDiameter() {
-        return  diameter;
+        return radius * 2;
     }
     /**
      * Change the diameter of the ball
      * @param diameter of ball
      */
     public void setDiameter(int diameter) {
-        this.diameter = diameter;
+        this.radius = diameter / 2;
+    }
+
+    public int getRadius() {
+        return radius;
     }
 
 
@@ -198,8 +218,8 @@ public class Ball {
      * @param y coordinate
      */
     public void setCoordinates(int x, int y) {
-        this.x = x;
-        this.y = y;
+        this.toX = x;
+        this.toY = y;
     }
 
 
@@ -252,13 +272,10 @@ public class Ball {
     /**
      * Recalculates the balls XY and orientation based on the impact XY values.
      * @param obj the Object which the ball came into contact with
-     * @param impactOnX coordinate
-     * @param impactOnY coordinate
      */
-    public void impact(Impact obj, int impactOnX, int impactOnY) {
-        x = impactOnX;
-        y = impactOnY;
-        speed -= 2;
+    public void impact(Impact obj) {
+        toX = (int) posX;
+        toY = (int) posY;
 
         directionAngle = (short)Calculate.reflectionAngle(previousAngle, obj.getNormal());
         if (directionAngle == -1) {
@@ -276,18 +293,43 @@ public class Ball {
         newXYAndAngle();
     }
 
+    public void linearStep(double step) {
+
+        // When the slope ratio is greater than |1| the x coordinate of the line is
+        // calculated rather than the y as it provides more accurate result.
+        if (Math.abs(lineGradient) < 1) {
+
+            // if the ball is moving towards 0 on the x axis, step is negative.
+            if (xTravel == -1) step = -(step);
+
+            posX += step;
+            posY = Calculate.yCoordinate(lineGradient, posX, yIntercept);
+        }
+        else {
+            // if the ball is moving towards 0 on the y axis, step is negative.
+            if (yTravel == -1) step = -(step);
+
+            posY += step;
+            posX = Calculate.xCoordinate(lineGradient, posY, yIntercept);
+        }
+    }
 
     // changes position and orientation state of the ball
     private void newXYAndAngle() {
-        fromX = x;
-        fromY = y;
+        fromX = toX;
+        fromY = toY;
+
         previousAngle = directionAngle;
-        int[] neXYvals = nextPos.nextPos(x, y, directionAngle, boundary[0],boundary[1]);
-        x = neXYvals[0];
-        y = neXYvals[1];
+        int[] neXYvals = nextPos.nextPos(toX, toY, directionAngle, boundary[0],boundary[1]);
+        toX = neXYvals[0];
+        toY = neXYvals[1];
+        calculateLinearValues();
         directionAngle = (short) neXYvals[2];
-        xTravel = (byte) Integer.compare(x, fromX);
-        yTravel = (byte) Integer.compare(y, fromY);
+        xTravel = (byte) Integer.compare(toX, fromX);
+        yTravel = (byte) Integer.compare(toY, fromY);
+
+
+
 
     }
 
@@ -308,7 +350,7 @@ public class Ball {
      * @param length of travel the the ball is limited to
      */
     public void setBoundaryLength(int length) {
-        boundary[0] = (short) length;
+        boundary[0] = (short) (length - radius);
     }
 
     /**
@@ -316,7 +358,7 @@ public class Ball {
      * @param height of travel the ball is limited to
      */
     public void SetBoundaryHeight(int height) {
-        boundary[1] = (short) height;
+        boundary[1] = (short) (height - radius);
     }
 
     /**
@@ -325,9 +367,44 @@ public class Ball {
      * @param height of travel the ball is limited to
      */
     public void setBallBounds(int length, int height) {
-        boundary[0] = (short) (length - diameter / 2);
-        boundary[1] = (short) (height - diameter / 2);
+        boundary[0] = (short) (length - radius);
+        boundary[1] = (short) (height - radius);
 
     }
 
+    public boolean isWithinBounds() {
+        return  posX > 0 && posX < boundary[0] &&
+                posY > 0 && posY < boundary[1];
+    }
+
+    /* linear Algebra Calculation */
+
+    private void calculateLinearValues() {
+
+        lineGradient = Calculate.gradientOfLine(fromX, fromY, toX, toY);
+
+        yIntercept = Calculate.yIntercept(lineGradient, toX, toY);
+
+        distanceBetweenPoints = Calculate.distanceBetweenPoints(fromX, fromY, toX, toY);
+    }
+
+    public void printVariables() {
+        System.out.println(
+                "slope:\t\t\t" + lineGradient +
+                        "\nbetweenPoints:\t" + distanceBetweenPoints +
+                        "\nyIntercept:\t\t" + yIntercept +
+                        "\ntoX:\t\t\t" + toX +
+                        "\ntoY:\t\t\t" + toY +
+                        "\nfromX:\t\t\t" + fromX +
+                        "\nfromY\t\t\t" + fromY
+        );
+        System.out.println("\n\n");
+    }
+
+    public void setPosY(int y) {
+        posY = y;
+    }
+    public void setPosX(int x) {
+        posX = x;
+    }
 }

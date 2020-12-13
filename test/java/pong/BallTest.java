@@ -29,31 +29,31 @@ class BallTest {
 
     @Test
     void ballsXposition() {
-        assertEquals(aBall.getX(), 0);
+        assertEquals(aBall.getToX(), 0);
 
     }
 
     @Test
     void ballsXpositionChange() {
-        aBall.setX(10);
-        assertEquals(aBall.getX(), 10);
+        aBall.setToX(10);
+        assertEquals(aBall.getToX(), 10);
     }
 
     @Test
     void ballsYposition() {
-        assertEquals(aBall.getY(), 0);
+        assertEquals(aBall.getToY(), 0);
     }
 
     @Test
     void ballsYpositionChange() {
-        aBall.setY(10);
-        assertEquals(aBall.getY(), 10);
+        aBall.setToY(10);
+        assertEquals(aBall.getToY(), 10);
     }
 
     @Test
     void ballsCoordinates() {
-        int x = aBall.getX();
-        int y = aBall.getY();
+        int x = aBall.getToX();
+        int y = aBall.getToY();
         assertArrayEquals(new int[] {x, y}, new int[] {0,0});
     }
 
@@ -66,8 +66,8 @@ class BallTest {
     @Test
     void ballCoordinateChange() {
         aBall.setCoordinates(10, 10);
-        int x = aBall.getX();
-        int y = aBall.getY();
+        int x = aBall.getToX();
+        int y = aBall.getToY();
         assertArrayEquals(new int[] {x, y}, new int[] {10,10});
     }
 

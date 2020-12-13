@@ -16,7 +16,6 @@ import pong.PongGame;
 import pong.Net;
 import sample.view.DrawPong;
 import sample.view.GameScenes;
-import utilities.Calculate;
 
 //import java.awt.*;
 
@@ -34,33 +33,25 @@ public class Main extends Application {
     int gameAreaHeight;
     PongGame gameLogic;
     DrawPong gameGraphics;
-    double bX;
-    double bY;
-    double bG;
-    double bYi;
-    double ballTravel;
-    double spacerFrame = 10;
     Scene rootScene;
     Scene gameScene;
+    double step;
 
 
     @Override
     public void init(){
         screenWidth = 800;
         screenHeight = 600;
-        gameAreaWidth = 700;
-        gameAreaHeight = 550;
+        gameAreaWidth = screenWidth;
+        gameAreaHeight = 500;
         gameLogic = new PongGame(gameAreaWidth, gameAreaHeight,true);
-
-        ballCalculateLinearValues();
-
         gameGraphics = new DrawPong(
                 new Canvas(gameAreaWidth, gameAreaHeight),
                 gameLogic,
                 Color.BLUE,
                 Color.WHITE
         );
-
+        recalculateStep();
         rootScene = GameScenes.startScene(800, 600);
         gameScene = GameScenes.gameScene(
                 (int) rootScene.getWidth(),
@@ -81,7 +72,10 @@ public class Main extends Application {
             KeyCode code = gameStartKeys.getCode();
 
             if (code == KeyCode.ENTER) {
+                gameLogic.start();
                 primaryStage.setScene(gameScene);
+
+
             }
             if (code == KeyCode.ESCAPE) {
                 primaryStage.close();
@@ -122,39 +116,35 @@ public class Main extends Application {
 
             @Override
             public void handle(ActionEvent ae) {
-                gameGraphics.clearGraphics();
+                if (gameLogic.isActive) {
 
-                Impact  aBallImpact = gameLogic.isThereABallImpact(bX, bY);
-                boolean delay = false;
-                if (aBallImpact != null) {
+                    Impact aBallImpact = gameLogic.isThereABallImpact(
+                            gameLogic.ball.getXPos(),
+                            gameLogic.ball.getYPos()
+                    );
 
-                    if (aBallImpact.toString().equals("net")) {
-                        gameLogic.registerScore((Net) aBallImpact);
-                        gameLogic.serveBall();
+                    if (aBallImpact != null) {
+
+                        if (aBallImpact.toString().equals("net")) {
+                            gameLogic.registerScore((Net) aBallImpact);
+                            gameLogic.serveBall();
+
+                        } else {
+                            recalculateStep();
+                            gameLogic.ball.impact(aBallImpact);
+                            gameLogic.ball.increaseSpeed(5);
+                        }
+                    }
+
+                    if (gameLogic.ball.isWithinBounds()) {
+
+                        gameGraphics.render();
+                        //gameLogic.ball.printVariables();
                     }
                     else {
-                        gameLogic.pongBall.increaseSpeed(5);
-                        gameLogic.pongBall.impact(aBallImpact, (int) bX, (int) bY);
+                        gameLogic.ball.nextMove();
                     }
-                    ballCalculateLinearValues();
-                }
-                if (!(
-                        bX > 0 &&
-                        bX + (gameLogic.pongBall.getDiameter() / 2.0) < gameAreaWidth &&
-                        bY > 0 &&
-                        bY + (gameLogic.pongBall.getDiameter() / 2.0) < gameAreaHeight
-                )) {
-                    gameLogic.pongBall.nextMove();
-                    ballCalculateLinearValues();
-                }
-                if (gameLogic.gameEnds) {
-                    gameGraphics.drawGameOver();
-                    gameloop.stop();
-                }
-                else {
-                    gameGraphics.drawPaddles();
-                    ballChangeXYPos();
-                    gameGraphics.drawBall(bX, bY);
+                    changeBallPos();
                 }
             }
         });
@@ -165,71 +155,12 @@ public class Main extends Application {
 
     }
 
-
-
-    private void ballCalculateLinearValues() {
-
-        bX = gameLogic.pongBall.getPreviousX();
-        bY = gameLogic.pongBall.getPreviousY();
-
-        bG = Calculate.gradientOfLine(
-                gameLogic.pongBall.getPreviousX(),
-                gameLogic.pongBall.getPreviousY(),
-                gameLogic.pongBall.getX(),
-                gameLogic.pongBall.getY()
-        );
-
-        bYi = Calculate.yIntercept(
-                bG,
-                gameLogic.pongBall.getX(),
-                gameLogic.pongBall.getY()
-        );
-
-        ballTravel = Calculate.distanceBetweenPoints(
-                gameLogic.pongBall.getPreviousX(),
-                gameLogic.pongBall.getPreviousY(),
-                gameLogic.pongBall.getX(),
-                gameLogic.pongBall.getY()
-        );
+    private void changeBallPos() {
+        gameLogic.ball.linearStep(step);
     }
 
-    /*
-     * Whenever the game loop is called a new XY position of the ball is required,
-     * The XY position is derived from a linear equation, using the precalculated
-     * slope and y increment. A progression step (pixels moved) is derived by
-     * taking the total distance the ball must travel and multiplying it by a
-     * fraction of a second.
-     */
-    private void ballChangeXYPos()  {
-        //System.out.println("travel" + ballTravel + " yinc " + bYi);
-
-        double step = gameAreaWidth / (300 - gameLogic.pongBall.getSpeed());
-
-
-
-
-        // When the slope ratio is greater than |1| the x coordinate of the line is
-        // calculated rather than the y as it provides more accurate result.
-        if (Math.abs(bG) < 1) {
-
-            // if the ball is moving towards 0 on the x axis, step is negative.
-            if (gameLogic.pongBall.getXTravel() == -1) {
-                step = -(step);
-            }
-            bX += step;
-            bY = Calculate.yCoordinate(bG, bX, bYi);
-        }
-        else {
-            // if the ball is moving towards 0 on the y axis, step is negative.
-            if (gameLogic.pongBall.getYTravel() == -1) {
-                step = -(step);
-            }
-            bY += step;
-            bX = Calculate.xCoordinate(bG, bY, bYi);
-        }
-        //System.out.println("x" + bX + " y" +bY);
-
-
+    private void recalculateStep() {
+        step = gameAreaWidth / (300 - gameLogic.ball.getSpeed());
     }
 
     public static void main(String[] args) {
