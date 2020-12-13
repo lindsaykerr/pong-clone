@@ -219,7 +219,7 @@ public class Ball {
      * Increases the ball speed by a value
      * @param incrementValue increment value, limit maximum speed of {@value #MAXSPEED}
      */
-    void increaseSpeed(int incrementValue) {
+    public void increaseSpeed(int incrementValue) {
         if (speed + incrementValue <= MAXSPEED)
             speed += incrementValue;
         else

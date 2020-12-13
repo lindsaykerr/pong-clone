@@ -184,7 +184,7 @@ public class Paddle implements Impact {
 
     @Override
     public Impact testImpact(double x, double y) {
-        if (x > posX && x < posX+width && y > posY && y < posY+height) {
+        if (x >= posX && x <= posX+width && y >= posY && y <= posY+height) {
             return this;
         }
         return null;

@@ -15,21 +15,22 @@ public class PongGame {
 
         bd = new Board(boardWidth, boardHeight);
         pongBall = new Ball((int)(boardWidth * .03));
+        pongBall.setBallBounds(boardWidth, boardHeight);
         isSinglePlayerGame = singlePlayer;
 
         if (singlePlayer) {
             paddles[0] = new Paddle(
                     (int)(boardWidth * 0.05),
-                    (int)(boardHeight / 2.0 - (boardHeight * .15) / 2.0),
+                    (int)(boardHeight / 2.0 - (boardHeight * .1) / 2.0),
                     (int)(boardWidth * .025),
-                    (int)(boardHeight * .15),
+                    (int)(boardHeight * .1),
                     0,
                     boardHeight,
-                    (int)(boardHeight * .02)
+                    (int)(boardHeight * .04)
             );
             impactObject[0] = paddles[0];
             scores[0] = new Score(5);
-            nets[0] = new Net(0, 0, (int)(boardWidth * 0.02), boardHeight, 0, scores[0]);
+            nets[0] = new Net(0, 0, (int)(boardWidth * 0.01), boardHeight, 0, scores[0]);
             players[0] = new Player(paddles[0], scores[0]);
             impactObject[1] = nets[0];
 
