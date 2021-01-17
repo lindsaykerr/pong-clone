@@ -1,7 +1,6 @@
 package pong;
 
 
-
 import pong.nexpos.NextPosFromQuads;
 import pong.nexpos.StrategyNextPos;
 import utilities.Calculate;
@@ -47,19 +46,18 @@ public class Ball {
 
 
     /* limitations */
-    private final short[] boundary;
+    private short[] boundary = new short[4];
 
 
     public Ball() {
         radius = 0;
-        boundary = new short[]{100, 100};
+        boundary = new short[]{0, 0, 100, 100};
     }
 
 
     public Ball(int diameter) {
 
         this.radius = diameter / 2;
-        boundary = new short[2];
     }
 
 
@@ -320,10 +318,17 @@ public class Ball {
         fromY = toY;
 
         previousAngle = directionAngle;
-        int[] neXYvals = nextPos.nextPos(toX, toY, directionAngle, boundary[0],boundary[1]);
-        toX = neXYvals[0];
-        toY = neXYvals[1];
+        int[] neXYvals = nextPos.nextPos(
+                toX,
+                toY,
+                directionAngle,
+                boundary[2]-radius,
+                boundary[3]-radius
+        );
+        toX = neXYvals[0]+radius;
+        toY = neXYvals[1]+radius;
         calculateLinearValues();
+        System.out.println("bounds x1 "+boundary[0] +" bounds y1 "+boundary[1]+" bounds x2 "+boundary[2]+" bounds y2 "+ boundary[3]);
         directionAngle = (short) neXYvals[2];
         xTravel = (byte) Integer.compare(toX, fromX);
         yTravel = (byte) Integer.compare(toY, fromY);
@@ -350,7 +355,8 @@ public class Ball {
      * @param length of travel the the ball is limited to
      */
     public void setBoundaryLength(int length) {
-        boundary[0] = (short) (length - radius);
+        boundary[0] = (short) (radius);
+        boundary[2] = (short) (length - radius);
     }
 
     /**
@@ -358,7 +364,8 @@ public class Ball {
      * @param height of travel the ball is limited to
      */
     public void SetBoundaryHeight(int height) {
-        boundary[1] = (short) (height - radius);
+        boundary[1] = (short) (radius);
+        boundary[3] = (short) (height - radius);
     }
 
     /**
@@ -367,14 +374,16 @@ public class Ball {
      * @param height of travel the ball is limited to
      */
     public void setBallBounds(int length, int height) {
-        boundary[0] = (short) (length - radius);
-        boundary[1] = (short) (height - radius);
+        boundary[0] = (short) (radius);
+        boundary[1] = (short) (radius);
+        boundary[2] = (short) (length - radius);
+        boundary[3] = (short) (height - radius);
 
     }
 
     public boolean isWithinBounds() {
-        return  posX > 0 && posX < boundary[0] &&
-                posY > 0 && posY < boundary[1];
+        return  posX > boundary[0] && posX < boundary[2] &&
+                posY > boundary[1] && posY < boundary[3];
     }
 
     /* linear Algebra Calculation */
@@ -386,6 +395,10 @@ public class Ball {
         yIntercept = Calculate.yIntercept(lineGradient, toX, toY);
 
         distanceBetweenPoints = Calculate.distanceBetweenPoints(fromX, fromY, toX, toY);
+    }
+
+    public void recalculateLinearValue(){
+        calculateLinearValues();
     }
 
     public void printVariables() {

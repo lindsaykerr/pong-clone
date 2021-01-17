@@ -8,6 +8,7 @@ import javafx.scene.*;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -48,8 +49,8 @@ public class Main extends Application {
         gameGraphics = new DrawPong(
                 new Canvas(gameAreaWidth, gameAreaHeight),
                 gameLogic,
-                Color.BLUE,
-                Color.WHITE
+                Color.grayRgb(30),
+                Color.grayRgb(220)
         );
         recalculateStep();
         rootScene = GameScenes.startScene(800, 600);
@@ -98,12 +99,20 @@ public class Main extends Application {
 
         } );
 
+        gameScene.addEventFilter(MouseEvent.MOUSE_MOVED, gamePlayMovement -> {
+            double y = gamePlayMovement.getSceneY();
+            System.out.println(y);
+            gameLogic.players[0].paddle.setSpeed(1);
+            gameLogic.players[0].paddle.movePaddleY(y);
+        });
+
 
         //primaryStage.getChildren().add(graphics.getCanvas());
 
 
-
+        
         Timeline gameloop = new Timeline();
+
 
         /* loop forever */
         gameloop.setCycleCount(Timeline.INDEFINITE);
@@ -112,12 +121,13 @@ public class Main extends Application {
         gameloop.setAutoReverse(false);
 
         /* implements the game loop */
-        KeyFrame keyFrame = new KeyFrame(Duration.seconds(0.01), new EventHandler<ActionEvent>(){
+        KeyFrame keyFrame = new KeyFrame(Duration.seconds(0.01), new EventHandler<>(){
 
             @Override
             public void handle(ActionEvent ae) {
                 if (gameLogic.isActive) {
-
+                    gameLogic.ball.recalculateLinearValue();
+                    changeBallPos();
                     Impact aBallImpact = gameLogic.isThereABallImpact(
                             gameLogic.ball.getXPos(),
                             gameLogic.ball.getYPos()
@@ -127,16 +137,23 @@ public class Main extends Application {
 
                         if (aBallImpact.toString().equals("net")) {
                             gameLogic.registerScore((Net) aBallImpact);
+                            gameGraphics.clearGraphics();
                             gameLogic.serveBall();
+                            changeBallPos();
+                            gameGraphics.drawGameOver();
+                            gameloop.setDelay(Duration.seconds(1));
+                            gameloop.stop();
+                            gameloop.playFromStart();
+
+
 
                         } else {
                             recalculateStep();
                             gameLogic.ball.impact(aBallImpact);
                             gameLogic.ball.increaseSpeed(5);
-                        }
-                    }
 
-                    if (gameLogic.ball.isWithinBounds()) {
+                        }
+                    } else if (gameLogic.ball.isWithinBounds()) {
 
                         gameGraphics.render();
                         //gameLogic.ball.printVariables();
@@ -144,7 +161,7 @@ public class Main extends Application {
                     else {
                         gameLogic.ball.nextMove();
                     }
-                    changeBallPos();
+
                 }
             }
         });

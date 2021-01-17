@@ -30,7 +30,7 @@ public class PongGame {
             );
             impactObject[0] = paddles[0];
             scores[0] = new Score(5);
-            nets[0] = new Net(0, 0, (int)(boardWidth * 0.01), boardHeight-50, 0, scores[0]);
+            nets[0] = new Net(0, 0, ball.getRadius() + 5, boardHeight, 0, scores[0]);
             players[0] = new Player(paddles[0], scores[0]);
             impactObject[1] = nets[0];
         }
@@ -45,16 +45,16 @@ public class PongGame {
      * Serves ball at a random angle
      */
     public void serveBall() {
-        ball.setFromX(0);
-        ball.setFromY(0);
-        ball.setPosX(10);
-        ball.setPosX(10);
-        ball.setToX( (int) (bd.getLength() * .15));
-        ball.setToY( (int) (bd.getHeight() * .7));
-        ball.setPosX(ball.getToX()/2);
-        ball.setPosY(ball.getToY()/2);
-        ball.setDirectionAngel(315+(int)(Math.random()*40));
+        ball.setPosX((int)(bd.getLength() *.25) + 10);
+        ball.setPosX((int)(bd.getLength() *.25) + 10);
+        ball.setFromX((int)(bd.getLength() * 0.25));
+        ball.setFromY((int)(bd.getHeight() / 2.0));
+        ball.setToX((int)(bd.getLength() *.25) +10);
+        ball.setToY((int)(bd.getHeight() / 2.0) +10);
+        ball.recalculateLinearValue();
+        ball.setDirectionAngel(315 +(int)(Math.random()*40));
         ball.nextMove();
+
     }
 
     /**

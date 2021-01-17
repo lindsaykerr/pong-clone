@@ -102,4 +102,5 @@ public class DrawPong {
     public Canvas getCanvas() {
         return gameRender;
     }
+
 }

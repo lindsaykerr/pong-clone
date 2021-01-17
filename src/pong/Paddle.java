@@ -201,5 +201,8 @@ public class Paddle implements Impact {
     }
 
 
+    public void movePaddleY(double y) {
+        if (y >= 0 && y <= yLimit-height) posY = (int) y;
+    }
 }
 
