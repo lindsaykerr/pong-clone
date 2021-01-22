@@ -1,6 +1,6 @@
 # Another Pong Clone
 
-## A javaFX/OpenFX pong clone
+## A WIP javaFX/OpenFX pong clone
 This project was started by me not long after completing my undergraduate course in Software Development. As many may know, such courses have a tendency to emphasise the theoretical side of software development, at the expense of thorough practical application. So, the main purpose of me starting this project is that of a practical exercise where I can begin to apply my knowledge in some way. And that was why Pong was chosen because Pong is fairly simple as games go and I have judged it to be a good initial project. 
 
 This project uses JavaFX/OpenFX which at the time of writing I not all too well familiar with. Yet, I found this project to be a good opportunity to introduce myself to and form an understanding of this Graphical/UI package. 
